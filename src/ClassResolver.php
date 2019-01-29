@@ -65,37 +65,43 @@ class ClassResolver {
     /**
      * @param $class
      * @param $namedParameters
-     * @return object
+     * @return object|null
      * @throws \Exception
      */
     private function resolveClass($class, $namedParameters)
     {
-        $reflectionClass = new \ReflectionClass($class);
-        $constructor = $reflectionClass->getConstructor();
-
-        if (is_null($constructor))
-        {
-            if (!$reflectionClass->isInstantiable())
+        $reflectionClass = null;
+        
+        try {
+            $reflectionClass = new \ReflectionClass($class);
+            $constructor = $reflectionClass->getConstructor();
+    
+            if (is_null($constructor))
             {
-                throw new \Exception('cannot resolve class: ' . $reflectionClass->getName());
-            }
-
-            $resolvedClass = $reflectionClass->newInstance();
-        }
-        else
-        {
-            $parameters = $this->parameterResolver->resolve($constructor->getParameters(), $namedParameters);
-
-            $resolvedClass = null;
-
-            if ($constructor->isPublic())
-            {
-                $resolvedClass = $reflectionClass->newInstanceArgs($parameters);
+                if (!$reflectionClass->isInstantiable())
+                {
+                    throw new \Exception('cannot resolve class: ' . $reflectionClass->getName());
+                }
+    
+                $resolvedClass = $reflectionClass->newInstance();
             }
             else
             {
-                throw new \Exception('class "' . $reflectionClass->getName() . '" does not have a public constructor so it is not accessible through autoloading');
+                $parameters = $this->parameterResolver->resolve($constructor->getParameters(), $namedParameters);
+    
+                $resolvedClass = null;
+    
+                if ($constructor->isPublic())
+                {
+                    $resolvedClass = $reflectionClass->newInstanceArgs($parameters);
+                }
+                else
+                {
+                    throw new \Exception('class "' . $reflectionClass->getName() . '" does not have a public constructor so it is not accessible through autoloading');
+                }
             }
+        } catch (\Exception $e) {
+            // 
         }
 
         $this->resolvedClasses[$class] = $resolvedClass;
