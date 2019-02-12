@@ -104,13 +104,15 @@ class CommandRunner {
         $this->logger->info('Finished executing command: ' . $requestedCommand);
     }
 
-    private function displayAllCommands(&$allRegisteredCommands)
+    private function displayAllCommands($allRegisteredCommands)
     {
         if (count($allRegisteredCommands) == 0)
         {
             $this->logger->info(' * No commands registered yet');
             return;
         }
+
+        ksort($allRegisteredCommands);
 
         /** @var Command $command */
         foreach ($allRegisteredCommands as $key => $command)

@@ -5,8 +5,14 @@ namespace Intersect\Core\Registry;
 class ConfigRegistry extends AbstractRegistry {
 
     private static $CONFIG_CACHE = [];
+    private $delimiter = '.';
 
-    public function flushCache()
+    public function __construct($delimiter = '.')
+    {
+        $this->delimiter = $delimiter;
+    }
+
+    public static function flushCache()
     {
         self::$CONFIG_CACHE = [];
     }
@@ -18,7 +24,7 @@ class ConfigRegistry extends AbstractRegistry {
             return self::$CONFIG_CACHE[$key];
         }
 
-        $keyParts = explode('.', $key);
+        $keyParts = explode($this->delimiter, $key);
 
         $configs = $this->getAll();
         $configData = null;
@@ -45,6 +51,7 @@ class ConfigRegistry extends AbstractRegistry {
     public function register($configData, $obj = null)
     {
         $this->registeredData = array_replace_recursive($this->registeredData, $configData);
+        self::flushCache();
     }
 
     public function unregister($key)
