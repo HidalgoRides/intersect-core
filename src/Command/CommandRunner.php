@@ -2,7 +2,6 @@
 
 namespace Intersect\Core\Command;
 
-use Intersect\Core\Event;
 use Intersect\Core\Container;
 use Intersect\Core\Logger\Logger;
 use Intersect\Core\Command\Command;
@@ -48,6 +47,12 @@ class CommandRunner {
         {
             /** @var Command $command */
             $command = $allRegisteredCommands[$requestedCommand];
+
+            if ($command instanceof \Closure)
+            {
+                $command = $command();
+            }
+
             $description = $command->getDescription();
             $parameters = $command->getParameters();
 
@@ -98,6 +103,11 @@ class CommandRunner {
 
         if (!is_null($registeredCommand))
         {
+            if ($registeredCommand instanceof \Closure)
+            {
+                $registeredCommand = $registeredCommand();
+            }
+
             $registeredCommand->execute($argv);
         }
 
