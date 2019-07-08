@@ -50,13 +50,37 @@ class ConfigRegistry extends AbstractRegistry {
 
     public function register($configData, $obj = null)
     {
-        $this->registeredData = array_replace_recursive($this->registeredData, $configData);
+        $this->registeredData = $this->combineData($this->registeredData, $configData);
         self::flushCache();
     }
 
     public function unregister($key)
     {
         return;
+    }
+
+    private function combineData($registeredData, $newData)
+    {
+        while(list($key, $value) = each($newData))
+        {
+            if (is_array($value) && array_key_exists($key, $registeredData) && is_array($registeredData[$key])) 
+            {
+                if (array_keys($value) !== range(0, count($value) - 1))
+                {
+                    $registeredData[$key] = $this->combineData($registeredData[$key], $value);
+                }
+                else
+                {
+                    $registeredData[$key] = array_merge_recursive($registeredData[$key], $value);
+                }
+            }
+            else 
+            {
+                $registeredData[$key] = $value;
+            }
+        }
+
+        return $registeredData;
     }
 
 }

@@ -36,4 +36,27 @@ class ConfigRegistryTest extends TestCase {
         $this->assertEquals('override', $configRegistry->get('key'));
     }
 
+    public function test_noKeysUsed() 
+    {
+        $configRegistry = new ConfigRegistry();
+        
+        $configRegistry->register([
+            'routes' => [
+                'test'
+            ]
+        ]);
+
+        $configRegistry->register([
+            'routes' => [
+                'foo'
+            ]
+        ]);
+
+        $routeConfig = $configRegistry->get('routes');
+        $this->assertNotNull($routeConfig);
+        $this->assertCount(2, $routeConfig);
+        $this->assertTrue(in_array('test', $routeConfig));
+        $this->assertTrue(in_array('foo', $routeConfig));
+    }
+
 }
