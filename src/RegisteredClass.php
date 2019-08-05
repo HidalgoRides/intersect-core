@@ -7,10 +7,10 @@ class RegisteredClass {
     private $class;
     private $isSingleton;
 
-    public function __construct($class, $isSingleton)
+    public function __construct($class, bool $isSingleton)
     {
         $this->class = $class;
-        $this->isSingleton = boolval($isSingleton);
+        $this->isSingleton = $isSingleton;
     }
 
     public function getClass()

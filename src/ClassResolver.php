@@ -36,11 +36,6 @@ class ClassResolver {
             $class = $registeredClass->getClass();
             $isSingleton = $registeredClass->isSingleton();
 
-            if ($class instanceof \Closure)
-            {
-                return $class();
-            }
-
             if ($isSingleton && array_key_exists($key, $this->resolvedClasses))
             {
                 return $this->resolvedClasses[$key];
@@ -59,7 +54,11 @@ class ClassResolver {
             }
         }
 
-        return $this->resolveClass((is_null($registeredClass) ? $key : $registeredClass->getClass()), $namedParameters);
+        $resolvedClass = $this->resolveClass((is_null($registeredClass) ? $key : $registeredClass->getClass()), $namedParameters);
+
+        $this->resolvedClasses[$key] = $resolvedClass;
+
+        return $resolvedClass;
     }
 
     /**
@@ -103,8 +102,6 @@ class ClassResolver {
         } catch (\Exception $e) {
             // 
         }
-
-        $this->resolvedClasses[$class] = $resolvedClass;
 
         return $resolvedClass;
     }
