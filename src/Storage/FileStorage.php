@@ -6,6 +6,21 @@ use Intersect\Core\Exception\ObjectNotFoundException;
 
 class FileStorage {
 
+    private static $INSTANCE = null;
+
+    /**
+     * @return self
+     */
+    public static function getInstance()
+    {
+        if (is_null(self::$INSTANCE))
+        {
+            self::$INSTANCE = new static();
+        }
+
+        return self::$INSTANCE;
+    }
+
     public function __construct() {}
 
     /**

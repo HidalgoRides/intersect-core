@@ -74,6 +74,42 @@ class Container {
     }
 
     /**
+     * @return array
+     */
+    public function getRegisteredEvents()
+    {
+        return $this->eventRegistry->getAll();
+    }
+
+    /** 
+     * @return array
+     */
+    public function getRegisteredCommands()
+    {
+        return $this->commandRegistry->getAll();
+    }
+
+    /** 
+     * @return array
+     */
+    public function getRegisteredConfigs($key = null, $defaultValue = null)
+    {
+        if (is_null($key))
+        {
+            return $this->configRegistry->getAll();
+        }
+
+        $registeredConfig = $this->configRegistry->get($key);
+
+        if (is_null($registeredConfig))
+        {
+            $registeredConfig = $defaultValue;
+        }
+
+        return $registeredConfig;
+    }
+
+    /**
      * @param $key
      * @param array $namedParameters
      * @return mixed|object
@@ -82,6 +118,42 @@ class Container {
     public function resolveClass($key, $namedParameters = [])
     {
         return $this->classResolver->resolve($key, $namedParameters);
+    }
+
+    /**
+     * @param $name
+     * @param $class
+     */
+    public function bind($name, $class)
+    {
+        $this->classRegistry->register($name, $class);
+    }
+
+    /**
+     * @param $key
+     * @param Command|Closure $command
+     */
+    public function command($key, $command)
+    {
+        $this->commandRegistry->register($key, $command);
+    }
+
+    /**
+     * @param $key
+     * @param Event $event
+     */
+    public function event($key, Event $event)
+    {
+        $this->eventRegistry->register($key, $event);
+    }
+
+    /**
+     * @param $name
+     * @param $class
+     */
+    public function singleton($name, $class)
+    {
+        $this->classRegistry->register($name, $class, true);
     }
 
 }
