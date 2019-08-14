@@ -24,6 +24,9 @@ class Container {
     /** @var EventRegistry */
     private $eventRegistry;
 
+    /** @var array */
+    private $migrationPaths = [];
+
     public function __construct()
     {
         $this->classRegistry = new ClassRegistry();
@@ -71,6 +74,14 @@ class Container {
     public function getEventRegistry()
     {
         return $this->eventRegistry;
+    }
+
+    /**
+     * @return array
+     */
+    public function getMigrationPaths()
+    {
+        return $this->migrationPaths;
     }
 
     /**
@@ -145,6 +156,14 @@ class Container {
     public function event($key, Event $event)
     {
         $this->eventRegistry->register($key, $event);
+    }
+
+    /**
+     * @param $path
+     */
+    public function migrationPath($path)
+    {
+        $this->migrationPaths[] = $path;
     }
 
     /**
