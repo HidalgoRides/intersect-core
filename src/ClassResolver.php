@@ -27,9 +27,14 @@ class ClassResolver {
      * @return mixed|object
      * @throws \Exception
      */
-    public function resolve($key, $namedParameters = [])
+    public function resolve($key, $namedParameters = [], $mustBeRegistered = false)
     {
         $registeredClass = $this->classRegistry->get($key);
+
+        if ($mustBeRegistered && is_null($registeredClass))
+        {
+            throw new \Exception('class "' . $key . '" is not registered and is not accessible for autoloading');
+        }
 
         if (!is_null($registeredClass))
         {

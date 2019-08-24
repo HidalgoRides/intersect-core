@@ -50,7 +50,7 @@ class ParameterResolver {
             else
             {
                 $parameterClassName = $parameterClass->getName();
-                $resolvedParameters[] = $this->classResolver->resolve($parameterClassName, $namedParameters);
+                $resolvedParameters[] = $this->classResolver->resolve($parameterClassName, $namedParameters, true);
             }
         }
 
