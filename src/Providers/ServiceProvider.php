@@ -15,5 +15,6 @@ abstract class ServiceProvider {
     }
 
     public function init() {}
+    public function initCommands() {}
 
 }
