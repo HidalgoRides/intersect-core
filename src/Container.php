@@ -162,6 +162,11 @@ class Container {
      */
     public function bind($name, $class)
     {
+        if (is_null($class))
+        {
+            $class = $name;
+        }
+
         $this->classRegistry->register($name, $class);
     }
 
@@ -213,6 +218,11 @@ class Container {
      */
     public function singleton($name, $class)
     {
+        if (is_null($class))
+        {
+            $class = $name;
+        }
+
         $this->classRegistry->register($name, $class, true);
     }
 

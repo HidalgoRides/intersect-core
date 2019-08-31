@@ -75,11 +75,12 @@ class ClassResolver {
     private function resolveClass($class, $namedParameters)
     {
         $reflectionClass = null;
+        $resolvedClass = null;
         
+        $reflectionClass = new \ReflectionClass($class);
+        $constructor = $reflectionClass->getConstructor();
+
         try {
-            $reflectionClass = new \ReflectionClass($class);
-            $constructor = $reflectionClass->getConstructor();
-    
             if (is_null($constructor))
             {
                 if (!$reflectionClass->isInstantiable())
