@@ -2,10 +2,13 @@
 
 namespace Intersect\Core;
 
+use Intersect\Core\Http\Router\Route;
+use Intersect\Core\Http\Router\RouteGroup;
 use Intersect\Core\Registry\ClassRegistry;
 use Intersect\Core\Registry\EventRegistry;
 use Intersect\Core\Registry\ConfigRegistry;
 use Intersect\Core\Registry\CommandRegistry;
+use Intersect\Core\Http\Router\RouteRegistry;
 
 class Container {
 
@@ -24,6 +27,9 @@ class Container {
     /** @var EventRegistry */
     private $eventRegistry;
 
+    /** @var RouteRegistry */
+    private $routeRegistry;
+
     /** @var array */
     private $migrationPaths = [];
 
@@ -34,6 +40,7 @@ class Container {
         $this->commandRegistry = new CommandRegistry();
         $this->configRegistry = new ConfigRegistry();
         $this->eventRegistry = new EventRegistry();
+        $this->routeRegistry = new RouteRegistry();
     }
 
     /**
@@ -74,6 +81,14 @@ class Container {
     public function getEventRegistry()
     {
         return $this->eventRegistry;
+    }
+
+    /** 
+     * @return RouteRegistry
+     */
+    public function getRouteRegistry()
+    {
+        return $this->routeRegistry;
     }
 
     /**
@@ -120,6 +135,16 @@ class Container {
         return $registeredConfig;
     }
 
+    public function getRegisteredRoutes($method = null, $path = null)
+    {
+        if (is_null($method))
+        {
+            return $this->routeRegistry->getAll();
+        }
+
+        return $this->routeRegistry->get($method, $path);
+    }
+
     /**
      * @param $key
      * @param array $namedParameters
@@ -164,6 +189,22 @@ class Container {
     public function migrationPath($path)
     {
         $this->migrationPaths[] = $path;
+    }
+
+    /**
+     * @param Route $route
+     */
+    public function route(Route $route)
+    {
+        $this->routeRegistry->registerRoute($route);
+    }
+
+    /**
+     * @param RouteGroup $routeGroup
+     */
+    public function routeGroup(RouteGroup $routeGroup)
+    {
+        $this->routeRegistry->registerRouteGroup($routeGroup);
     }
 
     /**
