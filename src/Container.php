@@ -160,7 +160,7 @@ class Container {
      * @param $name
      * @param $class
      */
-    public function bind($name, $class)
+    public function bind($name, $class = null)
     {
         if (is_null($class))
         {
@@ -216,7 +216,7 @@ class Container {
      * @param $name
      * @param $class
      */
-    public function singleton($name, $class)
+    public function singleton($name, $class = null)
     {
         if (is_null($class))
         {
