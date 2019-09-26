@@ -32,12 +32,10 @@ class FileStorage {
     {
         if (!$this->fileExists($path))
         {
-            $this->writeFile($path, $contents);
+            return $this->writeFile($path, $contents);
         }
-        else
-        {
-            $this->writeFile($path, $this->getFile($path) . $contents);
-        }
+        
+        return $this->writeFile($path, $this->getFile($path) . $contents);
     }
 
     /**
@@ -49,12 +47,10 @@ class FileStorage {
     {
         if (!$this->fileExists($path))
         {
-            $this->writeFile($path, $contents);
+            return $this->writeFile($path, $contents);
         }
-        else
-        {
-            $this->writeFile($path,  $contents . $this->getFile($path));
-        }
+        
+        return $this->writeFile($path,  $contents . $this->getFile($path));
     }
 
     /**
@@ -114,8 +110,10 @@ class FileStorage {
     {
         if ($this->fileExists($path))
         {
-            unlink($path);
+            return unlink($path);
         }
+
+        return true;
     }
 
     public function directoryExists($path)
@@ -137,8 +135,10 @@ class FileStorage {
     {
         if (!$this->fileExists($path))
         {
-            mkdir($path, $mode, true);
+            return mkdir($path, $mode, true);
         }
+
+        return true;
     }
 
     /**
