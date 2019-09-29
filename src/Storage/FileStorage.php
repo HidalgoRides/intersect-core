@@ -2,6 +2,10 @@
 
 namespace Intersect\Core\Storage;
 
+use SplFileInfo;
+use FilesystemIterator;
+use RecursiveIteratorIterator;
+use RecursiveDirectoryIterator;
 use Intersect\Core\Exception\ObjectNotFoundException;
 
 class FileStorage {
@@ -66,6 +70,25 @@ class FileStorage {
         }
 
         throw new ObjectNotFoundException('File', ['path' => $path]);
+    }
+
+    /**
+     * @param $path
+     * @param $flags
+     * @return SplFileInfo[]
+     */
+    public function getFiles($path, $flags = FilesystemIterator::KEY_AS_PATHNAME | FilesystemIterator::CURRENT_AS_FILEINFO)
+    {
+        $iterator = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($path, $flags));
+
+        $allFiles = [];
+        
+        foreach ($iterator as $file)
+        {
+            $allFiles[] = $file;
+        }
+
+        return $allFiles;
     }
 
     /**
@@ -159,6 +182,28 @@ class FileStorage {
     public function requireOnce($path, $data = [])
     {
         return $this->requirePath($path, $data, true);
+    }
+
+    /**
+     * @param $source
+     * @param $destination
+     * @param $context
+     * @return bool
+     */
+    public function copy($source, $destination, $context = null)
+    {
+        return copy($source, $destination, $context);
+    }
+
+    /**
+     * @param $source
+     * @param $destination
+     * @param $context
+     * @return bool
+     */
+    public function rename($oldName, $newName, $context = null)
+    {
+        return rename($oldName, $newName, $context);
     }
 
     /**
