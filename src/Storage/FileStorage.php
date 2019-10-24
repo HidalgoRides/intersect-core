@@ -95,9 +95,9 @@ class FileStorage {
      * @param $pattern
      * @return array
      */
-    public function glob($pattern)
+    public function glob($pattern, $flags = null)
     {
-        $files = glob($pattern);
+        $files = glob($pattern, $flags);
         if (!$files)
         {
             $files = [];
@@ -123,6 +123,30 @@ class FileStorage {
     public function fileExists($path)
     {
         return file_exists($path);
+    }
+
+    /**
+     * @param $path
+     */
+    public function deleteDirectory($path)
+    {
+        if (is_dir($path))
+        {
+            $files = $this->glob($path . '*', GLOB_MARK);
+            foreach ($files as $file)
+            {
+                $this->deleteDirectory($file);
+            }
+       
+            if ($this->fileExists($path))
+            {
+                rmdir($path);
+            }
+        }
+        else if (is_file($path))
+        {
+            $this->deleteFile($path);
+        }
     }
 
     /**
