@@ -40,6 +40,125 @@ class RouteResolverTest extends TestCase {
         $this->routeResolver = new RouteResolver($this->routeRegistry);
     }
 
+    public function test_resolve_get() 
+    {
+        $this->routeRegistry->registerRoute(Route::get('/get', 'Tests\Controllers\TestController#index'));
+
+        /** @var RouteAction $routeAction */
+        $routeAction = $this->routeResolver->resolve('GET', '/get');
+
+        $this->assertNotNull($routeAction);
+        $this->assertFalse($routeAction->getIsCallable());
+        $this->assertEquals('Tests\Controllers\TestController', $routeAction->getController());
+        $this->assertEquals('index', $routeAction->getMethod());
+        $this->assertCount(0, $routeAction->getNamedParameters());
+    }
+
+    public function test_resolve_post() 
+    {
+        $this->routeRegistry->registerRoute(Route::post('/post', 'Tests\Controllers\TestController#index'));
+
+        /** @var RouteAction $routeAction */
+        $routeAction = $this->routeResolver->resolve('POST', '/post');
+
+        $this->assertNotNull($routeAction);
+        $this->assertFalse($routeAction->getIsCallable());
+        $this->assertEquals('Tests\Controllers\TestController', $routeAction->getController());
+        $this->assertEquals('index', $routeAction->getMethod());
+        $this->assertCount(0, $routeAction->getNamedParameters());
+    }
+
+    public function test_resolve_delete() 
+    {
+        $this->routeRegistry->registerRoute(Route::delete('/delete', 'Tests\Controllers\TestController#index'));
+
+        /** @var RouteAction $routeAction */
+        $routeAction = $this->routeResolver->resolve('DELETE', '/delete');
+
+        $this->assertNotNull($routeAction);
+        $this->assertFalse($routeAction->getIsCallable());
+        $this->assertEquals('Tests\Controllers\TestController', $routeAction->getController());
+        $this->assertEquals('index', $routeAction->getMethod());
+        $this->assertCount(0, $routeAction->getNamedParameters());
+    }
+
+    public function test_resolve_put() 
+    {
+        $this->routeRegistry->registerRoute(Route::put('/put', 'Tests\Controllers\TestController#index'));
+
+        /** @var RouteAction $routeAction */
+        $routeAction = $this->routeResolver->resolve('PUT', '/put');
+
+        $this->assertNotNull($routeAction);
+        $this->assertFalse($routeAction->getIsCallable());
+        $this->assertEquals('Tests\Controllers\TestController', $routeAction->getController());
+        $this->assertEquals('index', $routeAction->getMethod());
+        $this->assertCount(0, $routeAction->getNamedParameters());
+    }
+
+    public function test_resolve_patch() 
+    {
+        $this->routeRegistry->registerRoute(Route::patch('/patch', 'Tests\Controllers\TestController#index'));
+
+        /** @var RouteAction $routeAction */
+        $routeAction = $this->routeResolver->resolve('PATCH', '/patch');
+
+        $this->assertNotNull($routeAction);
+        $this->assertFalse($routeAction->getIsCallable());
+        $this->assertEquals('Tests\Controllers\TestController', $routeAction->getController());
+        $this->assertEquals('index', $routeAction->getMethod());
+        $this->assertCount(0, $routeAction->getNamedParameters());
+    }
+
+    public function test_resolve_head() 
+    {
+        $this->routeRegistry->registerRoute(Route::head('/head', 'Tests\Controllers\TestController#index'));
+
+        /** @var RouteAction $routeAction */
+        $routeAction = $this->routeResolver->resolve('HEAD', '/head');
+
+        $this->assertNotNull($routeAction);
+        $this->assertFalse($routeAction->getIsCallable());
+        $this->assertEquals('Tests\Controllers\TestController', $routeAction->getController());
+        $this->assertEquals('index', $routeAction->getMethod());
+        $this->assertCount(0, $routeAction->getNamedParameters());
+    }
+
+    public function test_resolve_head_withOnlyGetRouteRegistered() 
+    {
+        $this->routeRegistry->registerRoute(Route::get('/get', 'Tests\Controllers\TestController#index'));
+
+        /** @var RouteAction $routeAction */
+        $routeAction = $this->routeResolver->resolve('HEAD', '/get');
+
+        $this->assertNotNull($routeAction);
+        $this->assertFalse($routeAction->getIsCallable());
+        $this->assertEquals('Tests\Controllers\TestController', $routeAction->getController());
+        $this->assertEquals('index', $routeAction->getMethod());
+        $this->assertCount(0, $routeAction->getNamedParameters());
+    }
+
+    public function test_resolve_head_withNoGetOrHeadRoutesRegistered() 
+    {
+        /** @var RouteAction $routeAction */
+        $routeAction = $this->routeResolver->resolve('HEAD', '/get');
+        $this->assertNull($routeAction);
+    }
+
+    public function test_resolve_options() 
+    {
+        $this->routeRegistry->registerRoute(Route::options('/options', 'Tests\Controllers\TestController#index'));
+
+        /** @var RouteAction $routeAction */
+        $routeAction = $this->routeResolver->resolve('OPTIONS', '/options');
+
+        $this->assertNotNull($routeAction);
+        $this->assertFalse($routeAction->getIsCallable());
+        $this->assertEquals('Tests\Controllers\TestController', $routeAction->getController());
+        $this->assertEquals('index', $routeAction->getMethod());
+        $this->assertCount(0, $routeAction->getNamedParameters());
+    }
+
     public function test_resolve_routeNotFound() 
     {
         /** @var RouteAction $routeAction */

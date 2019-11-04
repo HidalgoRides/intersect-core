@@ -50,6 +50,12 @@ class RouteResolver {
 
         if (!array_key_exists($baseUriPartsCount, $dynamicRoutes))
         {
+            // if HEAD requests cannot be found, attempt to resolve as a GET request
+            if ($method == 'HEAD')
+            {
+                return $this->resolve('GET', $baseUri);
+            }
+
             return null;
         }
 

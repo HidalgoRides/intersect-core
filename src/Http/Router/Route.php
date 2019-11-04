@@ -29,6 +29,21 @@ class Route {
         return self::newRouteForMethod('PUT', $path, $action, $extraOptions);
     }
 
+    public static function patch($path, $action, $extraOptions = [])
+    {
+        return self::newRouteForMethod('PATCH', $path, $action, $extraOptions);
+    }
+
+    public static function options($path, $action, $extraOptions = [])
+    {
+        return self::newRouteForMethod('OPTIONS', $path, $action, $extraOptions);
+    }
+
+    public static function head($path, $action, $extraOptions = [])
+    {
+        return self::newRouteForMethod('HEAD', $path, $action, $extraOptions);
+    }
+
     private static function newRouteForMethod($method, $path, $action, $extraOptions = [])
     {
         $route = new Route();
