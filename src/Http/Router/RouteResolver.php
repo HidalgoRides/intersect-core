@@ -43,7 +43,7 @@ class RouteResolver {
             return $this->getRouteActionFromRoute($registeredRoutes[$baseUri]);
         }
 
-        $dynamicRoutes = $this->routeRegistry->getDynamicRoutes();
+        $dynamicRoutes = $this->routeRegistry->getDynamicRoutes($method);
 
         $baseUriParts = explode('/', $baseUri);
         $baseUriPartsCount = count($baseUriParts);

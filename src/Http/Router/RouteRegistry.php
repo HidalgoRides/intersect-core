@@ -15,9 +15,12 @@ class RouteRegistry {
         return $this->registeredRoutes;
     }
 
-    public function getDynamicRoutes()
+    /**
+     * @return array
+     */
+    public function getDynamicRoutes($method)
     {
-        return $this->dynamicRoutes;
+        return (array_key_exists($method, $this->dynamicRoutes) ? $this->dynamicRoutes[$method] : []);
     }
 
     /**
@@ -44,13 +47,33 @@ class RouteRegistry {
         $method = $route->getMethod();
         $path = $route->getPath();
 
+        $optionsRoute = null;
+        $isOptionsRoute = ($method === 'OPTIONS');
+
+        if (!$isOptionsRoute)
+        {
+            $optionsRoute = Route::options($path, (function() {}), $route->getExtraOptions());
+        }
+
         if (strpos($path, ':') !== false)
         {
-            $pathPaths = explode('/', $path);
-            $this->dynamicRoutes[count($pathPaths)][$path] = $route;
+            $pathParts = explode('/', $path);
+            $pathPartsCount = count($pathParts);
+            $this->dynamicRoutes[$method][$pathPartsCount][$path] = $route;
+            // auto-register OPTIONS request
+            if (!$isOptionsRoute)
+            {
+                $this->dynamicRoutes['OPTIONS'][$pathPartsCount][$path] = $optionsRoute;
+            }
         }
 
         $this->registeredRoutes[$method][$path] = $route;
+
+        // auto-register OPTIONS request
+        if (!$isOptionsRoute)
+        {
+            $this->registeredRoutes['OPTIONS'][$path] = $optionsRoute;   
+        }
     }
 
     public function registerRouteGroup(RouteGroup $routeGroup)

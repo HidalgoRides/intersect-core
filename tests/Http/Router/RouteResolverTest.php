@@ -300,4 +300,32 @@ class RouteResolverTest extends TestCase {
         $this->assertArrayHasKey('before', $routeAction->getExtraOptions());
     }
 
+    public function test_resolve_autoRegisteredOptionsRequest() 
+    {
+        $this->routeRegistry->registerRoute(Route::delete('/delete/:me', 'Tests\Controllers\TestController#delete'));
+
+        /** @var RouteAction $routeAction */
+        $routeAction = $this->routeResolver->resolve('OPTIONS', '/delete/me');
+
+        $this->assertNotNull($routeAction);
+        $this->assertTrue($routeAction->getIsCallable());
+        $this->assertCount(1, $routeAction->getNamedParameters());
+    }
+
+    public function test_resolve_autoRegisteredOptionsRequestWithOverride() 
+    {
+        $this->routeRegistry->registerRoute(Route::delete('/delete/:me', 'Tests\Controllers\TestController#delete'));
+        $this->routeRegistry->registerRoute(Route::options('/delete/:me', 'Tests\Controllers\TestController#options'));
+
+        /** @var RouteAction $routeAction */
+        $routeAction = $this->routeResolver->resolve('OPTIONS', '/delete/me');
+
+        $this->assertNotNull($routeAction);
+        $this->assertNotNull($routeAction);
+        $this->assertFalse($routeAction->getIsCallable());
+        $this->assertEquals('Tests\Controllers\TestController', $routeAction->getController());
+        $this->assertEquals('options', $routeAction->getMethod());
+        $this->assertCount(1, $routeAction->getNamedParameters());
+    }
+
 }
