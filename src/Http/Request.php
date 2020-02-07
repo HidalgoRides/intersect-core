@@ -10,8 +10,10 @@ class Request {
     private static $DATA_ROOT_PUT = 'PUT';
     private static $DATA_ROOT_FILES = 'FILES';
     private static $DATA_ROOT_SERVER = 'SERVER';
-
+    
     private $data = [];
+    private $method = 'GET';
+    private $parameters = [];
 
     /**
      * @return Request
@@ -21,6 +23,11 @@ class Request {
         $request = new self();
         $request->initData(self::$DATA_ROOT_SERVER, $_SERVER);
         $request->initData(self::$DATA_ROOT_COOKIE, $_COOKIE);
+
+        if (array_key_exists('REQUEST_METHOD', $_SERVER))
+        {
+            $request->setMethod($_SERVER['REQUEST_METHOD']);
+        }
 
         switch ($request->getMethod())
         {
@@ -37,14 +44,44 @@ class Request {
                 break;
         }
 
+        $uriParts = explode('?', $request->getFullUri());
+        if (count($uriParts) > 1)
+        {
+            foreach (explode('&', $uriParts[1]) as $parameterPairs)
+            {
+                $parameterParts = explode('=', $parameterPairs);
+                $key = $parameterParts[0];
+                $value = (count($parameterParts) > 1) ? $parameterParts[1] : null;
+                $request->addParameter($key, $value);
+            }
+        }
+
         return $request;
     }
 
-    private function __construct() {}
+    public function addParameter($key, $value)
+    {
+        $this->parameters[$key] = $value;
+    }
+
+    public function getParameter($key)
+    {
+        return (array_key_exists($key, $this->parameters) ? $this->parameters[$key] : null);
+    }
+
+    public function getParameters()
+    {
+        return $this->parameters;
+    }
 
     public function getMethod()
     {
-        return $this->server('REQUEST_METHOD');
+        return $this->method;
+    }
+
+    public function setMethod($method)
+    {
+        $this->method = $method;
     }
 
     public function getBaseUri()
@@ -58,9 +95,19 @@ class Request {
         return $this->server('REQUEST_URI');
     }
 
+    public function setFullUri($uri)
+    {
+        $this->addServerData('REQUEST_URI', $uri);
+    }
+
     public function getHost()
     {
         return $this->server('SERVER_NAME');
+    }
+
+    public function setHost($host)
+    {
+        $this->addServerData('SERVER_NAME', $host);
     }
 
     public function getPort()
@@ -68,12 +115,42 @@ class Request {
         return $this->server('SERVER_PORT');
     }
 
+    public function setPort($port)
+    {
+        $this->addServerData('SERVER_PORT', $port);
+    }
+
     public function getUserAgent()
     {
         return $this->server('HTTP_USER_AGENT');
     }
 
-    public function data($key)
+    public function setUserAgent($userAgent)
+    {
+        $this->addServerData('HTTP_USER_AGENT', $userAgent);
+    }
+
+    public function addData($key, $value)
+    {
+        $this->data[$this->getMethod()][$key] = $value;
+    }
+
+    public function addCookieData($key, $value)
+    {
+        $this->data[self::$DATA_ROOT_COOKIE][$key] = $value;
+    }
+
+    public function addFileData($key, $value)
+    {
+        $this->data[self::$DATA_ROOT_FILES][$key] = $value;
+    }
+
+    public function addServerData($key, $value)
+    {
+        $this->data[self::$DATA_ROOT_SERVER][$key] = $value;
+    }
+
+    public function getDataValue($key)
     {
         $data = null;
         
@@ -93,19 +170,43 @@ class Request {
         return $data;
     }
 
-    public function cookie($key)
+    public function getCookieValue($key)
     {
         return $this->getData(self::$DATA_ROOT_COOKIE, $key);
     }
 
-    public function files($key)
+    public function getFileValue($key)
     {
         return $this->getData(self::$DATA_ROOT_FILES, $key);
     }
 
-    public function server($key)
+    public function getServerValue($key)
     {
         return $this->getData(self::$DATA_ROOT_SERVER, $key);
+    }
+
+    /** @deprecated - use getDataValue instead */
+    public function data($key)
+    {
+        return $this->getDataValue($key);
+    }
+
+    /** @deprecated - use getCookieValue instead */
+    public function cookie($key)
+    {
+        return $this->getCookieValue($key);
+    }
+
+    /** @deprecated - use getFileValue instead */
+    public function files($key)
+    {
+        return $this->getFileValue($key);
+    }
+
+    /** @deprecated - use getServerValue instead */
+    public function server($key)
+    {
+        return $this->getServerValue($key);
     }
     
     private function getData($rootKey, $key)

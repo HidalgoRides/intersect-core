@@ -7,15 +7,12 @@ use Intersect\Core\Http\Request;
 
 class RequestTest extends TestCase {
 
-    /** @var Request $request */
-    private $request;
-
     protected function setUp()
     {
         parent::setUp();
 
         $_SERVER['REQUEST_METHOD'] = 'GET';
-        $_SERVER['REQUEST_URI'] = '/?unit=test';
+        $_SERVER['REQUEST_URI'] = '/?unit=test&foo=bar';
         $_SERVER['SERVER_NAME'] = 'localhost';
         $_SERVER['SERVER_PORT'] = '8080';
         $_SERVER['HTTP_USER_AGENT'] = 'unit-test';
@@ -24,56 +21,120 @@ class RequestTest extends TestCase {
         $_POST['key'] = 'value';
         $_COOKIE['foo'] = 'bar';
         $_FILES['image'] = 'image';
-
-        $this->request = Request::initFromGlobals();
     }
 
     public function test_getBaseUri()
     {
-        $this->assertEquals('/', $this->request->getBaseUri());
+        $request = Request::initFromGlobals();
+        $this->assertEquals('/', $request->getBaseUri());
+
+        $request = new Request();
+        $request->setFullUri('/?unit=test');
+        $this->assertEquals('/', $request->getBaseUri());
+    }
+
+    public function test_getParameter()
+    {
+        $request = Request::initFromGlobals();
+        $this->assertEquals('test', $request->getParameter('unit'));
+        $this->assertEquals('bar', $request->getParameter('foo'));
+        $this->assertNull($request->getParameter('invalid'));
+
+        $request = new Request();
+        $request->addParameter('key', 'value');
+        $this->assertEquals('value', $request->getParameter('key'));
+    }
+
+    public function test_getParameters()
+    {
+        $request = Request::initFromGlobals();
+        $this->assertEquals(2, count($request->getParameters()));
+
+        $request = new Request();
+        $request->setFullUri('/?unit=test');
+        $this->assertEquals('/', $request->getBaseUri());
     }
 
     public function test_getMethod()
     {
-        $this->assertEquals('GET', $this->request->getMethod());
+        $request = Request::initFromGlobals();
+        $this->assertEquals('GET', $request->getMethod());
+
+        $request = new Request();
+        $this->assertEquals('GET', $request->getMethod());
     }
 
     public function test_getFullUri()
     {
-        $this->assertEquals('/?unit=test', $this->request->getFullUri());
+        $request = Request::initFromGlobals();
+        $this->assertEquals('/?unit=test&foo=bar', $request->getFullUri());
+
+        $request = new Request();
+        $request->setFullUri('/?unit=test&foo=bar');
+        $this->assertEquals('/?unit=test&foo=bar', $request->getFullUri());
     }
 
     public function test_getHost()
     {
-        $this->assertEquals('localhost', $this->request->getHost());
+        $request = Request::initFromGlobals();
+        $this->assertEquals('localhost', $request->getHost());
+
+        $request = new Request();
+        $request->setHost('localhost');
+        $this->assertEquals('localhost', $request->getHost());
     }
 
     public function test_getPort()
     {
-        $this->assertEquals('8080', $this->request->getPort());
+        $request = Request::initFromGlobals();
+        $this->assertEquals('8080', $request->getPort());
+
+        $request = new Request();
+        $request->setPort('8080');
+        $this->assertEquals('8080', $request->getPort());
     }
 
     public function test_getUserAgent()
     {
-        $this->assertEquals('unit-test', $this->request->getUserAgent());
+        $request = Request::initFromGlobals();
+        $this->assertEquals('unit-test', $request->getUserAgent());
+
+        $request = new Request();
+        $request->setUserAgent('unit-test');
+        $this->assertEquals('unit-test', $request->getUserAgent());
     }
 
     public function test_data_fromGetRequest()
     {
-        $this->assertEquals('test', $this->request->data('unit'));
+        $request = Request::initFromGlobals();
+        $this->assertEquals('test', $request->data('unit'));
+
+        $request = new Request();
+        $request->addData('get', 'data');
+        $this->assertEquals('data', $request->data('get'));
     }
 
     public function test_data_fromPostRequest()
     {
         $_SERVER['REQUEST_METHOD'] = 'POST';
-        $this->request = Request::initFromGlobals();
+        $request = Request::initFromGlobals();
 
-        $this->assertEquals('value', $this->request->data('key'));
+        $this->assertEquals('value', $request->data('key'));
+
+        $request = new Request();
+        $request->setMethod('POST');
+        $request->addData('post', 'data');
+        $this->assertEquals('data', $request->data('post'));
     }
 
     public function test_server()
     {
-        $this->assertEquals('GET', $this->request->server('REQUEST_METHOD'));
+        $request = Request::initFromGlobals();
+        $this->assertEquals('GET', $request->server('REQUEST_METHOD'));
+
+        $request = new Request();
+        $request->setMethod('POST');
+        $this->assertEquals('POST', $request->getMethod());
     }
 
     public function test_data_fromPutRequest()
@@ -82,23 +143,37 @@ class RequestTest extends TestCase {
 
         stream_wrapper_unregister('php');
         stream_wrapper_register('php', 'Tests\Http\TestPHPStreamWrapper');
-        $this->request = Request::initFromGlobals();
+        $request = Request::initFromGlobals();
         stream_wrapper_restore('php');
 
-        $this->assertEquals('data', $this->request->data('input'));
+        $this->assertEquals('data', $request->data('input'));
+
+        $request = new Request();
+        $request->setMethod('PUT');
+        $request->addData('put', 'data');
+        $this->assertEquals('data', $request->data('put'));
     }
 
     public function test_cookie()
     {
-        $this->assertEquals('bar', $this->request->cookie('foo'));
+        $request = Request::initFromGlobals();
+        $this->assertEquals('bar', $request->cookie('foo'));
+
+        $request = new Request();
+        $request->addCookieData('foo', 'bar');
+        $this->assertEquals('bar', $request->cookie('foo'));
     }
 
     public function test_files()
     {
         $_SERVER['REQUEST_METHOD'] = 'POST';
-        $this->request = Request::initFromGlobals();
+        $request = Request::initFromGlobals();
 
-        $this->assertEquals('image', $this->request->files('image'));
+        $this->assertEquals('image', $request->files('image'));
+
+        $request = new Request();
+        $request->addFileData('image', 'test');
+        $this->assertEquals('test', $request->files('image'));
     }
 
 }
