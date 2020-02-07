@@ -11,6 +11,9 @@ class Request {
     private static $DATA_ROOT_FILES = 'FILES';
     private static $DATA_ROOT_SERVER = 'SERVER';
     
+    private $authenticatedUserCallback;
+    private $authenticatedUser;
+    private $isAuthenticated;
     private $data = [];
     private $method = 'GET';
     private $parameters = [];
@@ -57,6 +60,37 @@ class Request {
         }
 
         return $request;
+    }
+
+    public function setAuthenticatedUserCallback(callable $callback)
+    {
+        $this->authenticatedUserCallback = $callback;
+    }
+
+    public function getAuthenticatedUser()
+    {
+        $authenticatedUser = null;
+
+        if (is_null($this->authenticatedUser) && !is_null($this->authenticatedUserCallback))
+        {
+            $callback = $this->authenticatedUserCallback;
+            $authenticatedUser = $callback($this);
+        }
+
+        $this->isAuthenticated = (!is_null($authenticatedUser));
+        $this->authenticatedUser = $authenticatedUser;
+
+        return $this->authenticatedUser;
+    }
+
+    public function isAuthenticated()
+    {
+        if (is_null($this->isAuthenticated))
+        {
+            $this->getAuthenticatedUser();
+        }
+
+        return $this->isAuthenticated;
     }
 
     public function addParameter($key, $value)
