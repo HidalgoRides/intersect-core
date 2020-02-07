@@ -69,16 +69,16 @@ class Request {
 
     public function getAuthenticatedUser()
     {
-        $authenticatedUser = null;
+        $authenticatedUser = $this->authenticatedUser;
 
-        if (is_null($this->authenticatedUser) && !is_null($this->authenticatedUserCallback))
+        if (is_null($authenticatedUser) && !is_null($this->authenticatedUserCallback))
         {
             $callback = $this->authenticatedUserCallback;
             $authenticatedUser = $callback($this);
+            $this->authenticatedUser = $authenticatedUser;
         }
 
         $this->isAuthenticated = (!is_null($authenticatedUser));
-        $this->authenticatedUser = $authenticatedUser;
 
         return $this->authenticatedUser;
     }
