@@ -37,6 +37,13 @@ class RouteResolverTest extends TestCase {
             'before' => 'test'
         ]));
 
+        $this->routeRegistry->registerRouteGroup(RouteGroup::for('nested-groups', [
+            Route::get('/nest', 'Tests\Controllers\TestController#nest'),
+            RouteGroup::for('nested-groups-2', [
+                Route::get('/nest2', 'Tests\Controllers\TestController#nest2')
+            ], ['prefix' => 'test'])
+        ], ['prefix' => 'unit']));
+
         $this->routeResolver = new RouteResolver($this->routeRegistry);
     }
 
@@ -326,6 +333,29 @@ class RouteResolverTest extends TestCase {
         $this->assertEquals('Tests\Controllers\TestController', $routeAction->getController());
         $this->assertEquals('options', $routeAction->getMethod());
         $this->assertCount(1, $routeAction->getNamedParameters());
+    }
+
+    public function test_resolve_nestedRouteGroups() 
+    {
+        /** @var RouteAction $routeAction */
+        $routeAction = $this->routeResolver->resolve('GET', '/unit/nest');
+
+        $this->assertNotNull($routeAction);
+        $this->assertFalse($routeAction->getIsCallable());
+        $this->assertEquals('Tests\Controllers\TestController', $routeAction->getController());
+        $this->assertEquals('nest', $routeAction->getMethod());
+        $this->assertCount(0, $routeAction->getNamedParameters());
+        $this->assertCount(1, $routeAction->getExtraOptions());
+
+        /** @var RouteAction $routeAction */
+        $routeAction = $this->routeResolver->resolve('GET', '/unit/test/nest2');
+
+        $this->assertNotNull($routeAction);
+        $this->assertFalse($routeAction->getIsCallable());
+        $this->assertEquals('Tests\Controllers\TestController', $routeAction->getController());
+        $this->assertEquals('nest2', $routeAction->getMethod());
+        $this->assertCount(0, $routeAction->getNamedParameters());
+        $this->assertCount(1, $routeAction->getExtraOptions());
     }
 
 }
