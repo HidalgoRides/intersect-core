@@ -23,7 +23,7 @@ class Request {
      */
     public static function initFromGlobals()
     {
-        $request = new self();
+        $request = new static();
         $request->initData(self::$DATA_ROOT_SERVER, $_SERVER);
         $request->initData(self::$DATA_ROOT_COOKIE, $_COOKIE);
 
