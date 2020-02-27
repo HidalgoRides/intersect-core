@@ -176,38 +176,16 @@ class RequestTest extends TestCase {
         $this->assertEquals('test', $request->files('image'));
     }
 
-    public function test_getAuthenticatedUser_noCallback()
-    {
-        $request = new Request();
-        $this->assertNull($request->getAuthenticatedUser());
-    }
-
-    public function test_getAuthenticatedUser_withCallback()
-    {
-        $request = new Request();
-
-        $request->setAuthenticatedUserCallback(function() {
-            return ['id' => 123];
-        });
-
-        $authenticatedUser = $request->getAuthenticatedUser();
-
-        $this->assertNotNull($authenticatedUser);
-        $this->assertEquals(123, $authenticatedUser['id']);
-    }
-
-    public function test_isAuthenticated_noCallback()
+    public function test_isAuthenticated_noAuthenticatedUserSet()
     {
         $request = new Request();
         $this->assertFalse($request->isAuthenticated());
     }
 
-    public function test_isAuthenticated_withCallback()
+    public function test_isAuthenticated_authenticatedUserSet()
     {
         $request = new Request();
-        $request->setAuthenticatedUserCallback(function() {
-            return ['id' => 123];
-        });
+        $request->setAuthenticatedUser(123);
 
         $this->assertTrue($request->isAuthenticated());
     }
