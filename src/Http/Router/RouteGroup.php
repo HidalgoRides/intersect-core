@@ -23,14 +23,29 @@ class RouteGroup {
         return $this->groupName;
     }
 
+    public function setGroupName($groupName)
+    {
+        $this->groupName = $groupName;
+    }
+
     public function getRouteConfig()
     {
         return $this->routeConfig;
     }
 
+    public function setRouteConfig(array $routeConfig)
+    {
+        $this->routeConfig = $routeConfig;
+    }
+
     public function getExtraOptions()
     {
         return $this->extraOptions;
+    }
+
+    public function setExtraOptions(array $extraOptions)
+    {
+        $this->extraOptions = $extraOptions;
     }
 
 }

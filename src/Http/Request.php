@@ -11,7 +11,6 @@ class Request {
     private static $DATA_ROOT_FILES = 'FILES';
     private static $DATA_ROOT_SERVER = 'SERVER';
     
-    private $authenticatedUserCallback;
     private $authenticatedUser;
     private $isAuthenticated;
     private $data = [];
@@ -23,7 +22,7 @@ class Request {
      */
     public static function initFromGlobals()
     {
-        $request = new self();
+        $request = new static();
         $request->initData(self::$DATA_ROOT_SERVER, $_SERVER);
         $request->initData(self::$DATA_ROOT_COOKIE, $_COOKIE);
 
@@ -62,35 +61,19 @@ class Request {
         return $request;
     }
 
-    public function setAuthenticatedUserCallback(callable $callback)
-    {
-        $this->authenticatedUserCallback = $callback;
-    }
-
     public function getAuthenticatedUser()
     {
-        $authenticatedUser = $this->authenticatedUser;
-
-        if (is_null($authenticatedUser) && !is_null($this->authenticatedUserCallback))
-        {
-            $callback = $this->authenticatedUserCallback;
-            $authenticatedUser = $callback($this);
-            $this->authenticatedUser = $authenticatedUser;
-        }
-
-        $this->isAuthenticated = (!is_null($authenticatedUser));
-
         return $this->authenticatedUser;
+    }
+
+    public function setAuthenticatedUser($authenticatedUser)
+    {
+        $this->authenticatedUser = $authenticatedUser;
     }
 
     public function isAuthenticated()
     {
-        if (is_null($this->isAuthenticated))
-        {
-            $this->getAuthenticatedUser();
-        }
-
-        return $this->isAuthenticated;
+        return (!is_null($this->authenticatedUser));
     }
 
     public function addParameter($key, $value)

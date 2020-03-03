@@ -87,6 +87,11 @@ class RouteRegistry {
             {
                 if (array_key_exists('prefix', $extraOptions))
                 {
+                    if (is_array($extraOptions['prefix']))
+                    {
+                        $extraOptions['prefix'] = implode('/', $extraOptions['prefix']);
+                    }
+
                     $path = '/' . trim($extraOptions['prefix'], '/') . rtrim($route->getPath(), '/');
                     $route->setPath($path);
                 }
@@ -97,6 +102,11 @@ class RouteRegistry {
                 }
 
                 $this->registerRoute($route);
+            }
+            else if ($route instanceof RouteGroup)
+            {
+                $route->setExtraOptions(array_merge_recursive($extraOptions, $route->getExtraOptions()));
+                $this->registerRouteGroup($route);
             }
         }
     }
