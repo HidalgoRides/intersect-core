@@ -9,10 +9,10 @@ class Request {
     private static $DATA_ROOT_POST = 'POST';
     private static $DATA_ROOT_PUT = 'PUT';
     private static $DATA_ROOT_FILES = 'FILES';
+    private static $DATA_ROOT_SESSION = 'SESSION';
     private static $DATA_ROOT_SERVER = 'SERVER';
     
     private $authenticatedUser;
-    private $isAuthenticated;
     private $data = [];
     private $method = 'GET';
     private $parameters = [];
@@ -25,6 +25,7 @@ class Request {
         $request = new static();
         $request->initData(self::$DATA_ROOT_SERVER, $_SERVER);
         $request->initData(self::$DATA_ROOT_COOKIE, $_COOKIE);
+        $request->initData(self::$DATA_ROOT_SESSION, $_SESSION);
 
         if (array_key_exists('REQUEST_METHOD', $_SERVER))
         {
@@ -162,6 +163,11 @@ class Request {
         $this->data[self::$DATA_ROOT_FILES][$key] = $value;
     }
 
+    public function addSessionData($key, $value)
+    {
+        $this->data[self::$DATA_ROOT_SESSION][$key] = $value;
+    }
+
     public function addServerData($key, $value)
     {
         $this->data[self::$DATA_ROOT_SERVER][$key] = $value;
@@ -195,6 +201,11 @@ class Request {
     public function getFileValue($key)
     {
         return $this->getData(self::$DATA_ROOT_FILES, $key);
+    }
+
+    public function getSessionValue($key)
+    {
+        return $this->getData(self::$DATA_ROOT_SESSION, $key);
     }
 
     public function getServerValue($key)
@@ -235,9 +246,12 @@ class Request {
     {
         $this->data[$rootKey] = [];
 
-        foreach ($data as $key => $value)
+        if (is_array($data))
         {
-            $this->data[$rootKey][$key] = $value;
+            foreach ($data as $key => $value)
+            {
+                $this->data[$rootKey][$key] = $value;
+            }
         }
     }
 

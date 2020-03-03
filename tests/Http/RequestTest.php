@@ -111,7 +111,7 @@ class RequestTest extends TestCase {
 
         $request = new Request();
         $request->addData('get', 'data');
-        $this->assertEquals('data', $request->data('get'));
+        $this->assertEquals('data', $request->getDataValue('get'));
     }
 
     public function test_data_fromPostRequest()
@@ -124,7 +124,7 @@ class RequestTest extends TestCase {
         $request = new Request();
         $request->setMethod('POST');
         $request->addData('post', 'data');
-        $this->assertEquals('data', $request->data('post'));
+        $this->assertEquals('data', $request->getDataValue('post'));
     }
 
     public function test_server()
@@ -151,7 +151,7 @@ class RequestTest extends TestCase {
         $request = new Request();
         $request->setMethod('PUT');
         $request->addData('put', 'data');
-        $this->assertEquals('data', $request->data('put'));
+        $this->assertEquals('data', $request->getDataValue('put'));
     }
 
     public function test_cookie()
@@ -161,7 +161,18 @@ class RequestTest extends TestCase {
 
         $request = new Request();
         $request->addCookieData('foo', 'bar');
-        $this->assertEquals('bar', $request->cookie('foo'));
+        $this->assertEquals('bar', $request->getCookieValue('foo'));
+    }
+
+    public function test_session()
+    {
+        $_SESSION['foo'] = 'bar';
+        $request = Request::initFromGlobals();
+        $this->assertEquals('bar', $request->getSessionValue('foo'));
+
+        $request = new Request();
+        $request->addSessionData('foo', 'bar');
+        $this->assertEquals('bar', $request->getSessionValue('foo'));
     }
 
     public function test_files()
@@ -173,7 +184,7 @@ class RequestTest extends TestCase {
 
         $request = new Request();
         $request->addFileData('image', 'test');
-        $this->assertEquals('test', $request->files('image'));
+        $this->assertEquals('test', $request->getFileValue('image'));
     }
 
     public function test_isAuthenticated_noAuthenticatedUserSet()
