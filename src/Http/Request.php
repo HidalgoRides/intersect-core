@@ -23,23 +23,45 @@ class Request {
     public static function initFromGlobals()
     {
         $request = new static();
-        $request->initData(self::$DATA_ROOT_SERVER, $_SERVER);
-        $request->initData(self::$DATA_ROOT_COOKIE, $_COOKIE);
-        $request->initData(self::$DATA_ROOT_SESSION, $_SESSION);
 
-        if (array_key_exists('REQUEST_METHOD', $_SERVER))
+        if (isset($_COOKIE))
         {
-            $request->setMethod($_SERVER['REQUEST_METHOD']);
+            $request->initData(self::$DATA_ROOT_COOKIE, $_COOKIE);
+        }
+        
+        if (isset($_SESSION))
+        {
+            $request->initData(self::$DATA_ROOT_SESSION, $_SESSION);
+        }
+
+        if (isset($_SERVER))
+        {
+            $request->initData(self::$DATA_ROOT_SERVER, $_SERVER);
+
+            if (array_key_exists('REQUEST_METHOD', $_SERVER))
+            {
+                $request->setMethod($_SERVER['REQUEST_METHOD']);
+            }
         }
 
         switch ($request->getMethod())
         {
             case 'GET':
-                $request->initData(self::$DATA_ROOT_GET, $_GET);
+                if (isset($_GET))
+                {
+                    $request->initData(self::$DATA_ROOT_GET, $_GET);
+                }
                 break;
             case 'POST':
-                $request->initData(self::$DATA_ROOT_POST, $_POST);
-                $request->initData(self::$DATA_ROOT_FILES, $_FILES);
+                if (isset($_POST))
+                {
+                    $request->initData(self::$DATA_ROOT_POST, $_POST);
+                }
+                
+                if (isset($_FILES))
+                {
+                    $request->initData(self::$DATA_ROOT_FILES, $_FILES);
+                }
                 break;
             case 'PUT':
                 parse_str(file_get_contents("php://input"), $putVariables);
