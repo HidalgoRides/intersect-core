@@ -2,6 +2,7 @@
 
 namespace Tests\Http\Router;
 
+use Intersect\Core\Http\Router\NamedRoute;
 use PHPUnit\Framework\TestCase;
 use Intersect\Core\Http\Router\Route;
 use Intersect\Core\Http\Router\RouteGroup;
@@ -305,6 +306,17 @@ class RouteResolverTest extends TestCase {
         $this->assertCount(0, $routeAction->getNamedParameters());
         $this->assertCount(1, $routeAction->getExtraOptions());
         $this->assertArrayHasKey('before', $routeAction->getExtraOptions());
+    }
+
+    public function test_resolveFromName() 
+    {
+        $this->routeRegistry->registerRoute(NamedRoute::get('test', '/', function(){}));
+
+        /** @var RouteAction $routeAction */
+        $routeAction = $this->routeResolver->resolveFromName('test');
+
+        $this->assertNotNull($routeAction);
+        $this->assertTrue($routeAction->getIsCallable());
     }
 
     public function test_resolve_autoRegisteredOptionsRequest() 

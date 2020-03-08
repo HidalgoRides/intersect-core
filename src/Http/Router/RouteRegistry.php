@@ -5,6 +5,7 @@ namespace Intersect\Core\Http\Router;
 class RouteRegistry {
 
     protected $registeredRoutes = [];
+    protected $registeredRoutesByName = [];
     protected $dynamicRoutes = [];
 
     /**
@@ -24,7 +25,8 @@ class RouteRegistry {
     }
 
     /**
-     * @param $key
+     * @param $method
+     * @param $path
      * @return mixed|null
      */
     public function get($method, $path = null)
@@ -40,11 +42,21 @@ class RouteRegistry {
     }
 
     /**
+     * @param $name
+     * @return Route|null
+     */
+    public function getByName($name)
+    {
+        return (array_key_exists($name, $this->registeredRoutesByName)) ? $this->registeredRoutesByName[$name] : null;
+    }
+
+    /**
      * @param Route $route
      */
     public function registerRoute(Route $route)
     {
         $method = $route->getMethod();
+        $name = $route->getName();
         $path = $route->getPath();
 
         $optionsRoute = null;
@@ -68,6 +80,11 @@ class RouteRegistry {
         }
 
         $this->registeredRoutes[$method][$path] = $route;
+
+        if (!is_null($name))
+        {
+            $this->registeredRoutesByName[$name] = $route;
+        }
 
         // auto-register OPTIONS request
         if (!$isOptionsRoute)

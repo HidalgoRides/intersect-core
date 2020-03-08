@@ -6,6 +6,7 @@ class Route {
 
     private $action;
     private $method;
+    private $name;
     private $path;
     private $extraOptions = [];
     
@@ -44,6 +45,9 @@ class Route {
         return self::newRouteForMethod('HEAD', $path, $action, $extraOptions);
     }
 
+    /**
+     * @return static
+     */
     private static function newRouteForMethod($method, $path, $action, $extraOptions = [])
     {
         $route = new Route();
@@ -75,6 +79,16 @@ class Route {
     public function setMethod($method)
     {
         $this->method = $method;
+    }
+
+    public function getName()
+    {
+        return $this->name;
+    }
+
+    public function setName($name)
+    {
+        $this->name = $name;
     }
 
     public function getPath()

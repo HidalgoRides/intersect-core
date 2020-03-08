@@ -104,6 +104,16 @@ class RouteResolver {
         return $routeAction;
     }
 
+    /**
+     * @return RouteAction
+     */
+    public function resolveFromName($name)
+    {
+        $route = $this->routeRegistry->getByName($name);
+
+        return (!is_null($route) ? $this->getRouteActionFromRoute($route) : null);
+    }
+
     private function getRouteActionFromRoute(Route $route)
     {
         $routeAction = new RouteAction();
