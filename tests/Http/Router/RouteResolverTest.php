@@ -327,7 +327,8 @@ class RouteResolverTest extends TestCase {
         $routeAction = $this->routeResolver->resolve('OPTIONS', '/delete/me');
 
         $this->assertNotNull($routeAction);
-        $this->assertTrue($routeAction->getIsCallable());
+        $this->assertNull($routeAction->getController());
+        $this->assertNull($routeAction->getMethod());
         $this->assertCount(1, $routeAction->getNamedParameters());
     }
 

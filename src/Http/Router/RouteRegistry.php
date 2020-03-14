@@ -64,7 +64,7 @@ class RouteRegistry {
 
         if (!$isOptionsRoute)
         {
-            $optionsRoute = Route::options($path, (function() {}), $route->getExtraOptions());
+            $optionsRoute = Route::options($path, null, $route->getExtraOptions());
         }
 
         if (strpos($path, ':') !== false)
