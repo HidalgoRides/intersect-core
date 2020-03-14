@@ -61,7 +61,7 @@ class ConfigRegistry extends AbstractRegistry {
 
     private function combineData($registeredData, $newData)
     {
-        while(list($key, $value) = each($newData))
+        foreach ($newData as $key => $value)
         {
             if (is_array($value) && array_key_exists($key, $registeredData) && is_array($registeredData[$key])) 
             {
