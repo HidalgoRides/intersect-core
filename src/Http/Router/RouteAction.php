@@ -60,4 +60,30 @@ class RouteAction {
         $this->extraOptions = $extraOptions;
     }
 
+    public static function fromRoute(Route $route)
+    {
+        $routeAction = new static();
+        $routeAction->setExtraOptions($route->getExtraOptions());
+
+        $action = $route->getAction();
+
+        if ($action instanceof \Closure)
+        {
+            $routeAction->setMethod($action);
+            $routeAction->setIsCallable(true);
+        }
+        else
+        {
+            $methodParts = explode('#', $action);
+
+            if (isset($methodParts[1]))
+            {
+                $routeAction->setController($methodParts[0]);
+                $routeAction->setMethod($methodParts[1]);
+            }
+        }
+
+        return $routeAction;
+    }
+
 }
