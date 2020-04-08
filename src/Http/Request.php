@@ -62,10 +62,13 @@ class Request {
                 {
                     $request->initData(self::$DATA_ROOT_FILES, $_FILES);
                 }
+
+                $request->initData(self::$DATA_ROOT_POST, self::getDataFromInputStream());
+                
                 break;
             case 'PUT':
-                parse_str(file_get_contents("php://input"), $putVariables);
-                $request->initData(self::$DATA_ROOT_PUT, $putVariables);
+                $request->initData(self::$DATA_ROOT_PUT, self::getDataFromInputStream());
+
                 break;
         }
 
@@ -264,11 +267,33 @@ class Request {
         return (isset($this->data[$rootKey][$key])) ? $this->data[$rootKey][$key] : null;
     }
 
+    private static function getDataFromInputStream()
+    {
+        $data = null;
+        $inputString = file_get_contents("php://input");
+                
+        if (trim($inputString) !== '') 
+        {
+            $inputVariables = json_decode($inputString, true);
+            if (is_null($inputVariables))
+            {
+                parse_str($inputString, $inputVariables);
+            }
+
+            $data = $inputVariables;
+        }
+
+        return $data;
+    }
+
     private function initData($rootKey, $data)
     {
-        $this->data[$rootKey] = [];
+        if (!array_key_exists($rootKey, $this->data))
+        {
+            $this->data[$rootKey] = [];
+        }
 
-        if (is_array($data))
+        if (!is_null($data) && is_array($data))
         {
             foreach ($data as $key => $value)
             {

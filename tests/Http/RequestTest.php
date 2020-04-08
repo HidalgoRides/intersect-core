@@ -127,6 +127,23 @@ class RequestTest extends TestCase {
         $this->assertEquals('data', $request->getDataValue('post'));
     }
 
+    public function test_data_fromPostRequest_jsonString()
+    {
+        $_SERVER['REQUEST_METHOD'] = 'POST';
+        
+        stream_wrapper_unregister('php');
+        stream_wrapper_register('php', 'Tests\Http\TestJsonStringStreamWrapper');
+        $request = Request::initFromGlobals();
+        stream_wrapper_restore('php');
+
+        $this->assertEquals('data', $request->data('input'));
+
+        $request = new Request();
+        $request->setMethod('POST');
+        $request->addData('post', 'data');
+        $this->assertEquals('data', $request->getDataValue('post'));
+    }
+
     public function test_server()
     {
         $request = Request::initFromGlobals();
@@ -143,6 +160,23 @@ class RequestTest extends TestCase {
 
         stream_wrapper_unregister('php');
         stream_wrapper_register('php', 'Tests\Http\TestPHPStreamWrapper');
+        $request = Request::initFromGlobals();
+        stream_wrapper_restore('php');
+
+        $this->assertEquals('data', $request->data('input'));
+
+        $request = new Request();
+        $request->setMethod('PUT');
+        $request->addData('put', 'data');
+        $this->assertEquals('data', $request->getDataValue('put'));
+    }
+
+    public function test_data_fromPutRequest_jsonString()
+    {
+        $_SERVER['REQUEST_METHOD'] = 'PUT';
+
+        stream_wrapper_unregister('php');
+        stream_wrapper_register('php', 'Tests\Http\TestJsonStringStreamWrapper');
         $request = Request::initFromGlobals();
         stream_wrapper_restore('php');
 
@@ -207,6 +241,41 @@ class TestPHPStreamWrapper {
 
     public $position = 0;
     public $bodyData = 'input=data';
+
+    public function stream_open($path, $mode = "c", $options, &$opened_path) 
+    {
+        return true;
+    }
+
+    public function stream_read($count) 
+    {
+        $this->position += strlen($this->bodyData);
+        if ($this->position > strlen($this->bodyData)) 
+        {
+            return false;
+        }
+
+        return $this->bodyData;
+    }
+
+    public function stream_eof() 
+    {
+        return $this->position >= strlen($this->bodyData);
+    }
+
+    public function stream_stat() 
+    {
+        return array('wrapper_data' => array('test'));
+    }
+
+    public function stream_close() {}
+
+}
+
+class TestJsonStringStreamWrapper {
+
+    public $position = 0;
+    public $bodyData = '{"input":"data"}';
 
     public function stream_open($path, $mode = "c", $options, &$opened_path) 
     {
